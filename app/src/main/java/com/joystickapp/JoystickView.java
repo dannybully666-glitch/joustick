@@ -2,6 +2,7 @@ package com.joystickapp;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,8 +10,8 @@ import android.view.View;
 public class JoystickView extends View {
 
     private float centerX, centerY;
-    private float baseRadius = 200;
-    private float hatRadius = 80;
+    private float baseRadius = 150f;
+    private float hatRadius = 60f;
     private float hatX, hatY;
 
     private Paint basePaint = new Paint();
@@ -18,10 +19,10 @@ public class JoystickView extends View {
 
     public JoystickView(Context context) {
         super(context);
-        basePaint.setColor(0xFF888888);
+        basePaint.setColor(Color.GRAY);
         basePaint.setAntiAlias(true);
 
-        hatPaint.setColor(0xFF000000);
+        hatPaint.setColor(Color.DKGRAY);
         hatPaint.setAntiAlias(true);
     }
 
@@ -43,16 +44,15 @@ public class JoystickView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float dx = event.getX() - centerX;
         float dy = event.getY() - centerY;
-
-        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+        double distance = Math.sqrt(dx * dx + dy * dy);
 
         if (event.getAction() != MotionEvent.ACTION_UP) {
             if (distance < baseRadius) {
                 hatX = event.getX();
                 hatY = event.getY();
             } else {
-                hatX = centerX + (dx / distance) * baseRadius;
-                hatY = centerY + (dy / distance) * baseRadius;
+                hatX = (float) (centerX + dx / distance * baseRadius);
+                hatY = (float) (centerY + dy / distance * baseRadius);
             }
         } else {
             hatX = centerX;
