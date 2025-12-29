@@ -1,7 +1,6 @@
 package com.joystickapp;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -12,24 +11,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    // Called from JoystickView
-    public void onDirection(String dir) {
-        WASDAccessibilityService s = WASDAccessibilityService.instance;
-        if (s == null) return;
+    // ===== CALLED FROM YOUR JOYSTICK VIEW =====
 
-        switch (dir) {
-            case "UP":
-                s.sendKey(KeyEvent.KEYCODE_W);
-                break;
-            case "DOWN":
-                s.sendKey(KeyEvent.KEYCODE_S);
-                break;
-            case "LEFT":
-                s.sendKey(KeyEvent.KEYCODE_A);
-                break;
-            case "RIGHT":
-                s.sendKey(KeyEvent.KEYCODE_D);
-                break;
-        }
+    public void moveUp() {
+        if (WASDAccessibilityService.instance != null)
+            WASDAccessibilityService.instance.pressW();
+    }
+
+    public void moveDown() {
+        if (WASDAccessibilityService.instance != null)
+            WASDAccessibilityService.instance.pressS();
+    }
+
+    public void moveLeft() {
+        if (WASDAccessibilityService.instance != null)
+            WASDAccessibilityService.instance.pressA();
+    }
+
+    public void moveRight() {
+        if (WASDAccessibilityService.instance != null)
+            WASDAccessibilityService.instance.pressD();
     }
 }
