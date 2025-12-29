@@ -1,33 +1,23 @@
 package com.joystickapp;
 
 import android.os.Bundle;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    TextView status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        status = findViewById(R.id.statusText);
     }
 
-    // ===== CALLED BY JoystickView =====
+    // Called from JoystickView
     public void onDirection(String dir) {
-        if (WASDAccessibilityService.instance == null) return;
-
-        switch (dir) {
-            case "UP":
-                WASDAccessibilityService.instance.pressW();
-                break;
-            case "DOWN":
-                WASDAccessibilityService.instance.pressS();
-                break;
-            case "LEFT":
-                WASDAccessibilityService.instance.pressA();
-                break;
-            case "RIGHT":
-                WASDAccessibilityService.instance.pressD();
-                break;
-        }
+        status.setText(dir);
     }
 }
