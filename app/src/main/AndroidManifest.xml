@@ -4,32 +4,33 @@
     <application
         android:allowBackup="true"
         android:label="Joystick App"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
 
-        <!-- Main launcher activity -->
+        <!-- Main UI -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <!-- IME keyboard service -->
+        <!-- INPUT METHOD (THIS IS WHAT GAMES SEE) -->
         <service
             android:name=".JoystickIME"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">
-
             <intent-filter>
-                <action android:name="android.view.InputMethod" />
+                <action android:name="android.view.InputMethod"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.view.im"
-                android:resource="@xml/ime_config" />
+                android:resource="@xml/ime_config"/>
         </service>
 
     </application>
