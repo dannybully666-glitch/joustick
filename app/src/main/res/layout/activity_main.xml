@@ -4,8 +4,9 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
+    <!-- Direction debug text -->
     <TextView
-        android:id="@+id/statusText"
+        android:id="@+id/dirText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="CENTER"
@@ -13,12 +14,11 @@
         android:textSize="20sp"
         android:layout_margin="16dp" />
 
+    <!-- Joystick -->
     <com.joystickapp.JoystickView
         android:id="@+id/joystick"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center"
-        android:clickable="true"
-        android:focusable="true" />
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:layout_gravity="center" />
 
 </FrameLayout>
