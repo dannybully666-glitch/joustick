@@ -4,69 +4,90 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputConnection;
 
 public class JoystickView extends View {
 
-    Paint base = new Paint(), knob = new Paint();
-    float cx, cy, bx, by, r = 150;
+    private Paint basePaint;
+    private Paint hatPaint;
 
-    public JoystickView(Context c) {
-        super(c);
-        base.setColor(Color.DKGRAY);
-        knob.setColor(Color.BLUE);
+    private float centerX, centerY;
+    private float baseRadius, hatRadius;
+    private float hatX, hatY;
+
+    public JoystickView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    private void init() {
+        basePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        basePaint.setColor(Color.DKGRAY);
+
+        hatPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        hatPaint.setColor(Color.BLUE);
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int ow, int oh) {
-        cx = cy = w / 2f;
-        bx = by = cx;
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        centerX = w / 2f;
+        centerY = h / 2f;
+
+        baseRadius = Math.min(w, h) * 0.45f;
+        hatRadius = baseRadius * 0.4f;
+
+        hatX = centerX;
+        hatY = centerY;
     }
 
     @Override
-    protected void onDraw(Canvas c) {
-        c.drawCircle(cx, cy, r, base);
-        c.drawCircle(bx, by, 60, knob);
+    protected void onDraw(Canvas canvas) {
+        canvas.drawCircle(centerX, centerY, baseRadius, basePaint);
+        canvas.drawCircle(hatX, hatY, hatRadius, hatPaint);
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        float dx = e.getX() - cx;
-        float dy = e.getY() - cy;
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
 
-        bx = cx + dx;
-        by = cy + dy;
+        float dx = x - centerX;
+        float dy = y - centerY;
 
-        sendKeys(dx, dy);
-        invalidate();
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        if (e.getAction() == MotionEvent.ACTION_UP) {
-            bx = by = cx;
-            sendKeyUp();
+        if (event.getAction() != MotionEvent.ACTION_UP) {
+            if (distance < baseRadius) {
+                hatX = x;
+                hatY = y;
+            } else {
+                float ratio = baseRadius / distance;
+                hatX = centerX + dx * ratio;
+                hatY = centerY + dy * ratio;
+            }
+
+            sendWASD(dx, dy, true);
+
+        } else {
+            hatX = centerX;
+            hatY = centerY;
+            sendWASD(0, 0, false);
         }
 
+        invalidate();
         return true;
     }
 
-    private void sendKeys(float dx, float dy) {
-        InputConnection ic = ((JoystickIME) JoystickIME.thisInstance).getCurrentInputConnection();
-        if (ic == null) return;
+    private void sendWASD(float dx, float dy, boolean down) {
+        JoystickIME ime = JoystickIME.get();
+        if (ime == null) return;
 
-        if (dx > 40) ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_D));
-        if (dx < -40) ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_A));
-        if (dy > 40) ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_S));
-        if (dy < -40) ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_W));
-    }
-
-    private void sendKeyUp() {
-        InputConnection ic = ((JoystickIME) JoystickIME.thisInstance).getCurrentInputConnection();
-        if (ic == null) return;
-
-        ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_W));
-        ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_A));
-        ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_S));
-        ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_D));
+        ime.sendKey(KeyEvent.KEYCODE_W, dy < -40 && down);
+        ime.sendKey(KeyEvent.KEYCODE_S, dy > 40 && down);
+        ime.sendKey(KeyEvent.KEYCODE_A, dx < -40 && down);
+        ime.sendKey(KeyEvent.KEYCODE_D, dx > 40 && down);
     }
 }
