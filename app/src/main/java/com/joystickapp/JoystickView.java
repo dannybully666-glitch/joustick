@@ -10,17 +10,25 @@ import android.view.View;
 
 public class JoystickView extends View {
 
-    private Paint basePaint, hatPaint;
-    private float centerX, centerY, baseRadius, hatRadius;
+    private float centerX, centerY;
+    private float baseRadius, hatRadius;
     private float hatX, hatY;
+
+    private Paint basePaint;
+    private Paint hatPaint;
+
+    public JoystickView(Context context) {
+        super(context);
+        init();
+    }
 
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
+    }
 
-        setClickable(true);
-        setFocusable(true);
-        setFocusableInTouchMode(true);
-
+    public JoystickView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         init();
     }
 
@@ -36,8 +44,10 @@ public class JoystickView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         centerX = w / 2f;
         centerY = h / 2f;
-        baseRadius = Math.min(w, h) * 0.45f;
-        hatRadius = baseRadius * 0.4f;
+
+        baseRadius = Math.min(w, h) / 2.5f;
+        hatRadius = baseRadius / 2f;
+
         hatX = centerX;
         hatY = centerY;
     }
@@ -50,49 +60,61 @@ public class JoystickView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        getParent().requestDisallowInterceptTouchEvent(true);
+        float dx = event.getX() - centerX;
+        float dy = event.getY() - centerY;
 
-        float x = event.getX();
-        float y = event.getY();
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        float dx = x - centerX;
-        float dy = y - centerY;
-        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+        switch (event.getAction()) {
 
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            hatX = centerX;
-            hatY = centerY;
-            sendDirection("CENTER");
-            invalidate();
-            return true;
+            case MotionEvent.ACTION_MOVE:
+                if (distance < baseRadius) {
+                    hatX = event.getX();
+                    hatY = event.getY();
+                } else {
+                    float ratio = baseRadius / distance;
+                    hatX = centerX + dx * ratio;
+                    hatY = centerY + dy * ratio;
+                }
+
+                String dir = calcDirection(dx, dy);
+                if (getContext() instanceof MainActivity) {
+                    ((MainActivity) getContext()).onDirection(dir);
+                }
+                invalidate();
+                break;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                hatX = centerX;
+                hatY = centerY;
+
+                if (getContext() instanceof MainActivity) {
+                    ((MainActivity) getContext()).onDirection("CENTER");
+                }
+                invalidate();
+                break;
         }
 
-        if (dist < baseRadius) {
-            hatX = x;
-            hatY = y;
-        } else {
-            float r = baseRadius / dist;
-            hatX = centerX + dx * r;
-            hatY = centerY + dy * r;
-        }
-
-        sendDirection(calcDirection(dx, dy));
-        invalidate();
         return true;
     }
 
-    private void sendDirection(String dir) {
-        if (getContext() instanceof MainActivity) {
-            ((MainActivity) getContext()).onDirection(dir);
-        }
-    }
-
+    // TRUE 8-WAY DIRECTION LOGIC
     private String calcDirection(float dx, float dy) {
-        if (Math.abs(dx) < 50 && Math.abs(dy) < 50) return "CENTER";
-        if (Math.abs(dx) > Math.abs(dy)) {
-            return dx > 0 ? "D" : "A";
-        } else {
-            return dy > 0 ? "S" : "W";
+        if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+            return "CENTER";
         }
+
+        double angle = Math.toDegrees(Math.atan2(-dy, dx));
+        if (angle < 0) angle += 360;
+
+        if (angle >= 337.5 || angle < 22.5) return "D";
+        if (angle < 67.5) return "WD";
+        if (angle < 112.5) return "W";
+        if (angle < 157.5) return "WA";
+        if (angle < 202.5) return "A";
+        if (angle < 247.5) return "SA";
+        if (angle < 292.5) return "S";
+        return "SD";
     }
 }
