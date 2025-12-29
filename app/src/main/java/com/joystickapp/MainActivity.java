@@ -1,7 +1,7 @@
 package com.joystickapp;
 
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.KeyEvent;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -10,23 +10,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        JoystickView joystick = findViewById(R.id.joystick);
-        TextView debugText = findViewById(R.id.debugText);
+    // Called from JoystickView
+    public void onDirection(String dir) {
+        WASDAccessibilityService s = WASDAccessibilityService.instance;
+        if (s == null) return;
 
-        joystick.setOnMoveListener((x, y) -> {
-            StringBuilder out = new StringBuilder();
-
-            if (y > 0.4f) out.append("W ");
-            if (y < -0.4f) out.append("S ");
-            if (x < -0.4f) out.append("A ");
-            if (x > 0.4f) out.append("D ");
-
-            if (out.length() == 0) {
-                debugText.setText("CENTER");
-            } else {
-                debugText.setText(out.toString().trim());
-            }
-        });
+        switch (dir) {
+            case "UP":
+                s.sendKey(KeyEvent.KEYCODE_W);
+                break;
+            case "DOWN":
+                s.sendKey(KeyEvent.KEYCODE_S);
+                break;
+            case "LEFT":
+                s.sendKey(KeyEvent.KEYCODE_A);
+                break;
+            case "RIGHT":
+                s.sendKey(KeyEvent.KEYCODE_D);
+                break;
+        }
     }
 }
