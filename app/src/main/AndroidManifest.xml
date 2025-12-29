@@ -1,20 +1,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+
     <application
+        android:allowBackup="true"
         android:label="JoystickApp"
-        android:theme="@style/Theme.JoystickApp">
+        android:supportsRtl="true">
 
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
         </activity>
 
-    </application>
+        <service
+            android:name=".HidGamepadService"
+            android:permission="android.permission.BIND_BLUETOOTH_HID_DEVICE"
+            android:exported="true"/>
 
+    </application>
 </manifest>
