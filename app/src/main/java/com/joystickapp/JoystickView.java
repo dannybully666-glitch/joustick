@@ -10,6 +10,16 @@ import android.view.View;
 
 public class JoystickView extends View {
 
+    public interface OnMoveListener {
+        void onMove(float x, float y);
+    }
+
+    private OnMoveListener listener;
+
+    public void setOnMoveListener(OnMoveListener l) {
+        listener = l;
+    }
+
     private Paint basePaint;
     private Paint hatPaint;
 
@@ -17,18 +27,6 @@ public class JoystickView extends View {
     private float baseRadius, hatRadius;
     private float hatX, hatY;
 
-    // ===== Listener =====
-    public interface OnMoveListener {
-        void onMove(float xPercent, float yPercent);
-    }
-
-    private OnMoveListener listener;
-
-    public void setOnMoveListener(OnMoveListener listener) {
-        this.listener = listener;
-    }
-
-    // ===== Constructor =====
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
@@ -58,7 +56,10 @@ public class JoystickView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        // Base circle
         canvas.drawCircle(centerX, centerY, baseRadius, basePaint);
+
+        // Hat / knob
         canvas.drawCircle(hatX, hatY, hatRadius, hatPaint);
     }
 
@@ -81,24 +82,20 @@ public class JoystickView extends View {
                 hatY = centerY + dy * ratio;
             }
         } else {
+            // Return to center
             hatX = centerX;
             hatY = centerY;
         }
 
+        // NORMALIZED OUTPUT (-1.0 to 1.0)
         if (listener != null) {
-            listener.onMove(getXPercent(), getYPercent());
+            listener.onMove(
+                    (hatX - centerX) / baseRadius,
+                    (hatY - centerY) / baseRadius
+            );
         }
 
         invalidate();
         return true;
-    }
-
-    // ===== Output values (-1 to +1) =====
-    public float getXPercent() {
-        return (hatX - centerX) / baseRadius;
-    }
-
-    public float getYPercent() {
-        return (hatY - centerY) / baseRadius;
     }
 }
