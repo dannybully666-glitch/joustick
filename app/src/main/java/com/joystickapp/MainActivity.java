@@ -13,8 +13,11 @@ public class MainActivity extends AppCompatActivity {
 
         JoystickView joystick = findViewById(R.id.joystick);
 
-        joystick.setOnMoveListener((x, y) → {
-            Log.d("JOYSTICK", "X=" + x + " Y=" + y);
+        joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
+            @Override
+            public void onMove(float x, float y) {
+                Log.d("JOYSTICK", "X=" + x + " Y=" + y);
+            }
         });
     }
 }
