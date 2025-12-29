@@ -3,24 +3,36 @@ package com.joystickapp;
 import android.inputmethodservice.InputMethodService;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputConnection;
 
 public class JoystickIME extends InputMethodService {
 
-    @Override
-    public View onCreateInputView() {
-        // NO keyboard UI
-        return null;
+    private static JoystickIME instance;
+
+    public static JoystickIME get() {
+        return instance;
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    public void onCreate() {
+        super.onCreate();
+        instance = this;
+    }
 
-        // Volume Up toggles joystick
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            JoystickOverlayService.toggle();
-            return true;
-        }
+    @Override
+    public View onCreateInputView() {
+        return getLayoutInflater().inflate(R.layout.activity_main, null);
+    }
 
-        return super.onKeyDown(keyCode, event);
+    public void sendKey(int keyCode, boolean down) {
+        InputConnection ic = getCurrentInputConnection();
+        if (ic == null) return;
+
+        ic.sendKeyEvent(
+                new KeyEvent(
+                        down ? KeyEvent.ACTION_DOWN : KeyEvent.ACTION_UP,
+                        keyCode
+                )
+        );
     }
 }
