@@ -11,10 +11,14 @@ import android.view.View;
 public class JoystickView extends View {
 
     public interface OnMoveListener {
-        void onMove(float angle, float strength);
+        void onMove(float x, float y);
     }
 
     private OnMoveListener moveListener;
+
+    public void setOnMoveListener(OnMoveListener listener) {
+        this.moveListener = listener;
+    }
 
     private Paint basePaint;
     private Paint hatPaint;
@@ -26,10 +30,6 @@ public class JoystickView extends View {
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
-    }
-
-    public void setOnMoveListener(OnMoveListener listener) {
-        this.moveListener = listener;
     }
 
     private void init() {
@@ -44,14 +44,17 @@ public class JoystickView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         centerX = w / 2f;
         centerY = h / 2f;
+
         baseRadius = Math.min(w, h) * 0.45f;
         hatRadius = baseRadius * 0.4f;
+
         hatX = centerX;
         hatY = centerY;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         canvas.drawCircle(centerX, centerY, baseRadius, basePaint);
         canvas.drawCircle(hatX, hatY, hatRadius, hatPaint);
     }
@@ -74,22 +77,16 @@ public class JoystickView extends View {
                 hatX = centerX + dx * ratio;
                 hatY = centerY + dy * ratio;
             }
-
-            float angle = (float) Math.toDegrees(Math.atan2(-dy, dx));
-            if (angle < 0) angle += 360;
-            float strength = Math.min(distance / baseRadius, 1f);
-
-            if (moveListener != null) {
-                moveListener.onMove(angle, strength);
-            }
-
         } else {
             hatX = centerX;
             hatY = centerY;
+        }
 
-            if (moveListener != null) {
-                moveListener.onMove(-1, 0);
-            }
+        float normX = (hatX - centerX) / baseRadius;
+        float normY = (centerY - hatY) / baseRadius;
+
+        if (moveListener != null) {
+            moveListener.onMove(normX, normY);
         }
 
         invalidate();
