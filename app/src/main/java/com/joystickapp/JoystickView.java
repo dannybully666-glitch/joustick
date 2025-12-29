@@ -15,9 +15,20 @@ public class JoystickView extends View {
 
     private float centerX, centerY;
     private float baseRadius, hatRadius;
-
     private float hatX, hatY;
 
+    // ===== Listener =====
+    public interface OnMoveListener {
+        void onMove(float xPercent, float yPercent);
+    }
+
+    private OnMoveListener listener;
+
+    public void setOnMoveListener(OnMoveListener listener) {
+        this.listener = listener;
+    }
+
+    // ===== Constructor =====
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
@@ -47,10 +58,7 @@ public class JoystickView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // Base
         canvas.drawCircle(centerX, centerY, baseRadius, basePaint);
-
-        // Knob
         canvas.drawCircle(hatX, hatY, hatRadius, hatPaint);
     }
 
@@ -61,7 +69,6 @@ public class JoystickView extends View {
 
         float dx = x - centerX;
         float dy = y - centerY;
-
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (event.getAction() != MotionEvent.ACTION_UP) {
@@ -74,12 +81,24 @@ public class JoystickView extends View {
                 hatY = centerY + dy * ratio;
             }
         } else {
-            // Return to center
             hatX = centerX;
             hatY = centerY;
         }
 
+        if (listener != null) {
+            listener.onMove(getXPercent(), getYPercent());
+        }
+
         invalidate();
         return true;
+    }
+
+    // ===== Output values (-1 to +1) =====
+    public float getXPercent() {
+        return (hatX - centerX) / baseRadius;
+    }
+
+    public float getYPercent() {
+        return (hatY - centerY) / baseRadius;
     }
 }
