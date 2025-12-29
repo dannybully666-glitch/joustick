@@ -5,102 +5,117 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class JoystickView extends View {
 
-    private Paint basePaint, hatPaint;
-    private float cx, cy, baseR, hatR;
-    private float hx, hy;
+    private Paint basePaint;
+    private Paint hatPaint;
 
-    private static final float DEADZONE = 0.25f; // 25% of radius
-    private String lastDir = "CENTER";
+    private float centerX, centerY;
+    private float baseRadius, hatRadius;
+    private float hatX, hatY;
 
-    public JoystickView(Context c, AttributeSet a) {
-        super(c, a);
+    // Key states
+    private boolean wDown, aDown, sDown, dDown;
+
+    public JoystickView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    private void init() {
         basePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         basePaint.setColor(Color.DKGRAY);
+
         hatPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hatPaint.setColor(Color.BLUE);
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int ow, int oh) {
-        cx = w / 2f;
-        cy = h / 2f;
-        baseR = Math.min(w, h) * 0.45f;
-        hatR = baseR * 0.4f;
-        hx = cx;
-        hy = cy;
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        centerX = w / 2f;
+        centerY = h / 2f;
+
+        baseRadius = Math.min(w, h) * 0.45f;
+        hatRadius = baseRadius * 0.4f;
+
+        hatX = centerX;
+        hatY = centerY;
     }
 
     @Override
-    protected void onDraw(Canvas c) {
-        c.drawCircle(cx, cy, baseR, basePaint);
-        c.drawCircle(hx, hy, hatR, hatPaint);
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        // Base circle
+        canvas.drawCircle(centerX, centerY, baseRadius, basePaint);
+
+        // Knob
+        canvas.drawCircle(hatX, hatY, hatRadius, hatPaint);
+    }
+
+    private void sendKey(int keyCode, boolean pressed) {
+        if (JoystickIME.instance != null) {
+            JoystickIME.instance.sendKey(keyCode, pressed);
+        }
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        float dx = e.getX() - cx;
-        float dy = e.getY() - cy;
-        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
 
-        if (e.getAction() == MotionEvent.ACTION_UP) {
-            reset();
-            sendDir("CENTER");
-            return true;
-        }
+        float dx = x - centerX;
+        float dy = y - centerY;
 
-        // Clamp knob inside base
-        if (dist > baseR) {
-            dx = dx / dist * baseR;
-            dy = dy / dist * baseR;
-        }
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        hx = cx + dx;
-        hy = cy + dy;
+        if (event.getAction() != MotionEvent.ACTION_UP) {
 
-        float normX = dx / baseR;
-        float normY = dy / baseR;
+            if (distance < baseRadius) {
+                hatX = x;
+                hatY = y;
+            } else {
+                float ratio = baseRadius / distance;
+                hatX = centerX + dx * ratio;
+                hatY = centerY + dy * ratio;
+            }
 
-        // DEADZONE CHECK
-        if (Math.abs(normX) < DEADZONE && Math.abs(normY) < DEADZONE) {
-            sendDir("CENTER");
+            float nx = dx / baseRadius;
+            float ny = dy / baseRadius;
+
+            boolean up = ny < -0.5f;
+            boolean down = ny > 0.5f;
+            boolean left = nx < -0.5f;
+            boolean right = nx > 0.5f;
+
+            if (up != wDown) sendKey(KeyEvent.KEYCODE_W, up);
+            if (down != sDown) sendKey(KeyEvent.KEYCODE_S, down);
+            if (left != aDown) sendKey(KeyEvent.KEYCODE_A, left);
+            if (right != dDown) sendKey(KeyEvent.KEYCODE_D, right);
+
+            wDown = up;
+            sDown = down;
+            aDown = left;
+            dDown = right;
+
         } else {
-            String dir = compute8Way(normX, normY);
-            sendDir(dir);
+            // Finger released → reset
+            hatX = centerX;
+            hatY = centerY;
+
+            sendKey(KeyEvent.KEYCODE_W, false);
+            sendKey(KeyEvent.KEYCODE_A, false);
+            sendKey(KeyEvent.KEYCODE_S, false);
+            sendKey(KeyEvent.KEYCODE_D, false);
+
+            wDown = aDown = sDown = dDown = false;
         }
 
         invalidate();
         return true;
     }
-
-    private void reset() {
-        hx = cx;
-        hy = cy;
-        invalidate();
-    }
-
-    private String compute8Way(float x, float y) {
-        if (x > 0.5f && Math.abs(y) < 0.5f) return "D";
-        if (x < -0.5f && Math.abs(y) < 0.5f) return "A";
-        if (y > 0.5f && Math.abs(x) < 0.5f) return "S";
-        if (y < -0.5f && Math.abs(x) < 0.5f) return "W";
-
-        if (x > 0 && y < 0) return "W+D";
-        if (x < 0 && y < 0) return "W+A";
-        if (x > 0 && y > 0) return "S+D";
-        if (x < 0 && y > 0) return "S+A";
-
-        return "CENTER";
-    }
-
-    private void sendDir(String dir) {
-        if (!dir.equals(lastDir)) {
-            lastDir = dir;
-            ((MainActivity) getContext()).onDirection(dir);
-        }
-    }
-            }
+}
