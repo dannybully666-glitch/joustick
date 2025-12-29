@@ -8,8 +8,17 @@ import android.view.accessibility.AccessibilityEvent;
 
 public class WASDAccessibilityService extends AccessibilityService {
 
-    private static final int SWIPE_DISTANCE = 200;
-    private static final int SWIPE_DURATION = 50;
+    // 🔹 Global instance (THIS FIXES YOUR ERROR)
+    public static WASDAccessibilityService instance;
+
+    private static final int SWIPE_DISTANCE = 180;
+    private static final int SWIPE_DURATION = 40;
+
+    @Override
+    protected void onServiceConnected() {
+        super.onServiceConnected();
+        instance = this;
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -21,14 +30,14 @@ public class WASDAccessibilityService extends AccessibilityService {
         // Not used
     }
 
-    // ===== PUBLIC API CALLED FROM ACTIVITY =====
+    // ===== PUBLIC MOVEMENT API =====
 
     public void pressW() { swipe(0, -SWIPE_DISTANCE); }
     public void pressS() { swipe(0, SWIPE_DISTANCE); }
     public void pressA() { swipe(-SWIPE_DISTANCE, 0); }
     public void pressD() { swipe(SWIPE_DISTANCE, 0); }
 
-    // ===== INTERNAL SWIPE =====
+    // ===== INTERNAL GESTURE =====
 
     private void swipe(int dx, int dy) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
@@ -44,7 +53,9 @@ public class WASDAccessibilityService extends AccessibilityService {
                 new GestureDescription.StrokeDescription(path, 0, SWIPE_DURATION);
 
         GestureDescription gesture =
-                new GestureDescription.Builder().addStroke(stroke).build();
+                new GestureDescription.Builder()
+                        .addStroke(stroke)
+                        .build();
 
         dispatchGesture(gesture, null, null);
     }
