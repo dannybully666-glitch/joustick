@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Required for overlay -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
     <application
         android:allowBackup="true"
         android:label="Joystick App"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-        <!-- Main UI -->
+        <!-- MAIN ACTIVITY -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <!-- INPUT METHOD (THIS IS WHAT GAMES SEE) -->
+        <!-- IME (Keyboard) -->
         <service
             android:name=".JoystickIME"
             android:permission="android.permission.BIND_INPUT_METHOD"
@@ -30,9 +30,13 @@
 
             <meta-data
                 android:name="android.view.im"
-                android:resource="@xml/ime_config"/>
+                android:resource="@xml/method"/>
         </service>
 
+        <!-- Overlay Service -->
+        <service
+            android:name=".JoystickOverlayService"
+            android:exported="false"/>
     </application>
 
 </manifest>
