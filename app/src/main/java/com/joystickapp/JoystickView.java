@@ -18,6 +18,13 @@ public class JoystickView extends View {
     private float baseRadius, hatRadius;
     private float hatX, hatY;
 
+    // REQUIRED for programmatic creation
+    public JoystickView(Context context) {
+        super(context);
+        init();
+    }
+
+    // REQUIRED for XML inflation
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
@@ -68,9 +75,7 @@ public class JoystickView extends View {
                 hatX = centerX + dx * ratio;
                 hatY = centerY + dy * ratio;
             }
-
             sendWASD(dx, dy, true);
-
         } else {
             hatX = centerX;
             hatY = centerY;
