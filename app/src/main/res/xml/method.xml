@@ -2,7 +2,6 @@
 <input-method xmlns:android="http://schemas.android.com/apk/res/android">
 
     <subtype
-        android:label="Joystick Keyboard"
-        android:keyboardMode="text" />
+        android:label="Joystick Keyboard" />
 
 </input-method>
