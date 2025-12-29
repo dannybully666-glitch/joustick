@@ -14,6 +14,9 @@ public class JoystickView extends View {
     private float cx, cy, baseR, hatR;
     private float hx, hy;
 
+    private static final float DEADZONE = 0.25f; // 25% of radius
+    private String lastDir = "CENTER";
+
     public JoystickView(Context c, AttributeSet a) {
         super(c, a);
         basePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -44,28 +47,60 @@ public class JoystickView extends View {
         float dy = e.getY() - cy;
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
-        if (e.getAction() != MotionEvent.ACTION_UP) {
-            if (dist < baseR) {
-                hx = e.getX();
-                hy = e.getY();
-            } else {
-                hx = cx + dx / dist * baseR;
-                hy = cy + dy / dist * baseR;
-            }
+        if (e.getAction() == MotionEvent.ACTION_UP) {
+            reset();
+            sendDir("CENTER");
+            return true;
+        }
 
-            String dir;
-            if (Math.abs(dx) > Math.abs(dy))
-                dir = dx > 0 ? "D" : "A";
-            else
-                dir = dy > 0 ? "S" : "W";
+        // Clamp knob inside base
+        if (dist > baseR) {
+            dx = dx / dist * baseR;
+            dy = dy / dist * baseR;
+        }
 
-            ((MainActivity) getContext()).onDirection(dir);
+        hx = cx + dx;
+        hy = cy + dy;
+
+        float normX = dx / baseR;
+        float normY = dy / baseR;
+
+        // DEADZONE CHECK
+        if (Math.abs(normX) < DEADZONE && Math.abs(normY) < DEADZONE) {
+            sendDir("CENTER");
         } else {
-            hx = cx;
-            hy = cy;
+            String dir = compute8Way(normX, normY);
+            sendDir(dir);
         }
 
         invalidate();
         return true;
     }
-}
+
+    private void reset() {
+        hx = cx;
+        hy = cy;
+        invalidate();
+    }
+
+    private String compute8Way(float x, float y) {
+        if (x > 0.5f && Math.abs(y) < 0.5f) return "D";
+        if (x < -0.5f && Math.abs(y) < 0.5f) return "A";
+        if (y > 0.5f && Math.abs(x) < 0.5f) return "S";
+        if (y < -0.5f && Math.abs(x) < 0.5f) return "W";
+
+        if (x > 0 && y < 0) return "W+D";
+        if (x < 0 && y < 0) return "W+A";
+        if (x > 0 && y > 0) return "S+D";
+        if (x < 0 && y > 0) return "S+A";
+
+        return "CENTER";
+    }
+
+    private void sendDir(String dir) {
+        if (!dir.equals(lastDir)) {
+            lastDir = dir;
+            ((MainActivity) getContext()).onDirection(dir);
+        }
+    }
+            }
