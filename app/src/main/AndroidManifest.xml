@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.joystickapp">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
         android:label="Joystick App"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
@@ -20,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <!-- INPUT METHOD (IME) SERVICE -->
+        <!-- IME keyboard service -->
         <service
             android:name=".JoystickIME"
             android:permission="android.permission.BIND_INPUT_METHOD"
