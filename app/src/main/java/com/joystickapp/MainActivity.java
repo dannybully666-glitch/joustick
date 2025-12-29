@@ -11,25 +11,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    // ===== CALLED FROM YOUR JOYSTICK VIEW =====
+    // ===== CALLED BY JoystickView =====
+    public void onDirection(String dir) {
+        if (WASDAccessibilityService.instance == null) return;
 
-    public void moveUp() {
-        if (WASDAccessibilityService.instance != null)
-            WASDAccessibilityService.instance.pressW();
-    }
-
-    public void moveDown() {
-        if (WASDAccessibilityService.instance != null)
-            WASDAccessibilityService.instance.pressS();
-    }
-
-    public void moveLeft() {
-        if (WASDAccessibilityService.instance != null)
-            WASDAccessibilityService.instance.pressA();
-    }
-
-    public void moveRight() {
-        if (WASDAccessibilityService.instance != null)
-            WASDAccessibilityService.instance.pressD();
+        switch (dir) {
+            case "UP":
+                WASDAccessibilityService.instance.pressW();
+                break;
+            case "DOWN":
+                WASDAccessibilityService.instance.pressS();
+                break;
+            case "LEFT":
+                WASDAccessibilityService.instance.pressA();
+                break;
+            case "RIGHT":
+                WASDAccessibilityService.instance.pressD();
+                break;
+        }
     }
 }
