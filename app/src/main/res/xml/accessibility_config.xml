@@ -4,6 +4,5 @@
     android:accessibilityEventTypes="typeAllMask"
     android:accessibilityFeedbackType="feedbackGeneric"
     android:accessibilityFlags="flagRequestFilterKeyEvents"
-    android:canRetrieveWindowContent="false"
-    android:notificationTimeout="100"
-    android:description="@string/app_name"/>
+    android:canRetrieveWindowContent="true"
+    android:description="@string/app_name" />
