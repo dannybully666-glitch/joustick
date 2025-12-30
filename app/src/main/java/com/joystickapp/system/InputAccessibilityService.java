@@ -13,11 +13,11 @@ public class InputAccessibilityService extends AccessibilityService {
         instance = this;
     }
 
-    public void sendKey(int keyCode) {
-        dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
-        dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+    public void sendKey(int key) {
+        dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, key));
+        dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, key));
     }
 
-    @Override public void onAccessibilityEvent(AccessibilityEvent event) {}
+    @Override public void onAccessibilityEvent(AccessibilityEvent e) {}
     @Override public void onInterrupt() {}
 }
