@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.joystickapp.overlay.FloatingOverlayService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,18 +15,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Request overlay permission
+        // Overlay permission
         if (!Settings.canDrawOverlays(this)) {
-            Intent intent = new Intent(
+            startActivity(new Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            startActivity(intent);
+                    Uri.parse("package:" + getPackageName())
+            ));
         }
 
-        // Start floating overlay
-        startService(new Intent(this,
-                com.example.joystickapp.overlay.FloatingOverlayService.class));
+        // Open keyboard settings (like GK+ Step 1)
+        startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
 
-        finish(); // No UI needed
+        // Start overlay
+        startService(new Intent(this, FloatingOverlayService.class));
+
+        finish();
     }
 }
