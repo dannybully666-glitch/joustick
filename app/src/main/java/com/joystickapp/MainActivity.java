@@ -1,3 +1,13 @@
+package com.joystickapp;
+
+import android.content.Intent;
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.joystickapp.service.FloatingJoystickService;
+import com.joystickapp.util.PermissionUtil;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
