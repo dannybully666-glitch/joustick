@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
 public class FloatingJoystickView extends View {
 
@@ -15,7 +16,16 @@ public class FloatingJoystickView extends View {
 
     public FloatingJoystickView(Context context) {
         super(context);
-        setLayoutParams(new LayoutParams((int)(radius*2), (int)(radius*2)));
+
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                (int) (radius * 2),
+                (int) (radius * 2),
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                android.graphics.PixelFormat.TRANSLUCENT
+        );
+
+        setLayoutParams(params);
     }
 
     @Override
@@ -23,7 +33,7 @@ public class FloatingJoystickView extends View {
         float dx = e.getX() - center.x;
         float dy = e.getY() - center.y;
 
-        float dist = (float) Math.sqrt(dx*dx + dy*dy);
+        float dist = (float) Math.sqrt(dx * dx + dy * dy);
         if (dist > radius) {
             dx = dx / dist * radius;
             dy = dy / dist * radius;
@@ -34,7 +44,7 @@ public class FloatingJoystickView extends View {
         if (listener != null)
             listener.onMove(dx / radius, dy / radius);
 
-        if (e.getAction() == MotionEvent.ACTION_UP) {
+        if (e.getAction() == MotionEvent.ACTION_UP && listener != null) {
             listener.onMove(0, 0);
         }
         return true;
