@@ -1,12 +1,3 @@
-package com.joystickapp;
-
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.widget.Button;
-import androidx.appcompat.app.AppCompatActivity;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -14,17 +5,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button start = findViewById(R.id.btn_start);
-
-        start.setOnClickListener(v -> {
-            if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-            } else {
-                startService(new Intent(this, OverlayService.class));
+        findViewById(R.id.btn_start).setOnClickListener(v -> {
+            if (!PermissionUtil.canDrawOverlays(this)) {
+                PermissionUtil.requestOverlay(this);
+                return;
             }
+
+            startService(new Intent(this, FloatingJoystickService.class));
         });
     }
 }
