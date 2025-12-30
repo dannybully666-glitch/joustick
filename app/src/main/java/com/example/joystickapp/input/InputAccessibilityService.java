@@ -17,15 +17,23 @@ public class InputAccessibilityService extends AccessibilityService {
     public static void sendKeyStatic() {
         if (instance == null) return;
 
-        instance.dispatchKeyEvent(
-                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_W));
-        instance.dispatchKeyEvent(
-                new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_W));
+        // KEY DOWN
+        instance.sendKeyEvent(
+                new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_W)
+        );
+
+        // KEY UP
+        instance.sendKeyEvent(
+                new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_W)
+        );
     }
 
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {}
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+        // Not needed for key injection
+    }
 
     @Override
-    public void onInterrupt() {}
+    public void onInterrupt() {
+    }
 }
