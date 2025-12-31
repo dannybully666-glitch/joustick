@@ -2,61 +2,86 @@ package com.example.virtualcontainer.input
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
+import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import kotlin.math.hypot
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-class JoystickView(context: Context) : View(context) {
+class JoystickView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : View(context, attrs) {
 
-    var onMove: ((Float, Float) -> Unit)? = null
-
-    private val basePaint = Paint().apply {
-        color = 0x55FFFFFF
-        isAntiAlias = true
+    private val basePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(120, 0, 0, 0)
+        style = Paint.Style.FILL
     }
 
-    private val knobPaint = Paint().apply {
-        color = 0xAAFFFFFF
-        isAntiAlias = true
+    private val knobPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(200, 255, 255, 255)
+        style = Paint.Style.FILL
     }
 
-    private var cx = 0f
-    private var cy = 0f
-    private var kx = 0f
-    private var ky = 0f
-    private var radius = 0f
+    private var centerX = 0f
+    private var centerY = 0f
+    private var baseRadius = 0f
+    private var knobRadius = 0f
+
+    private var knobX = 0f
+    private var knobY = 0f
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        cx = w / 2f
-        cy = h / 2f
-        kx = cx
-        ky = cy
-        radius = minOf(w, h) / 2.5f
+        super.onSizeChanged(w, h, oldw, oldh)
+
+        centerX = w / 2f
+        centerY = h / 2f
+
+        baseRadius = min(w, h) * 0.4f
+        knobRadius = baseRadius * 0.4f
+
+        knobX = centerX
+        knobY = centerY
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawCircle(cx, cy, radius, basePaint)
-        canvas.drawCircle(kx, ky, radius / 2, knobPaint)
+        super.onDraw(canvas)
+
+        canvas.drawCircle(centerX, centerY, baseRadius, basePaint)
+        canvas.drawCircle(knobX, knobY, knobRadius, knobPaint)
     }
 
-    override fun onTouchEvent(e: MotionEvent): Boolean {
-        val dx = e.x - cx
-        val dy = e.y - cy
-        val dist = hypot(dx, dy)
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val dx = event.x - centerX
+        val dy = event.y - centerY
+        val distance = sqrt(dx * dx + dy * dy)
 
-        if (e.action != MotionEvent.ACTION_UP) {
-            val scale = if (dist > radius) radius / dist else 1f
-            kx = cx + dx * scale
-            ky = cy + dy * scale
-            onMove?.invoke(dx / radius, dy / radius)
-        } else {
-            kx = cx
-            ky = cy
-            onMove?.invoke(0f, 0f)
+        when (event.action) {
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_MOVE -> {
+                if (distance <= baseRadius) {
+                    knobX = event.x
+                    knobY = event.y
+                } else {
+                    val angle = atan2(dy, dx)
+                    knobX = centerX + cos(angle) * baseRadius
+                    knobY = centerY + sin(angle) * baseRadius
+                }
+                invalidate()
+            }
+
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL -> {
+                knobX = centerX
+                knobY = centerY
+                invalidate()
+            }
         }
-
-        invalidate()
         return true
     }
 }
