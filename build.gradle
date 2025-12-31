@@ -1,13 +1,6 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+// Root build.gradle
+// Repositories are defined ONLY in settings.gradle (modern Gradle rule)
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+buildscript {
+    // NO repositories here
 }
