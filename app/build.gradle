@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.joustick"
-        minSdk 26
+        minSdk 21
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -18,18 +18,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile(
-                "proguard-android-optimize.txt"
-            ), "proguard-rules.pro"
         }
-    }
-
-    buildFeatures {
-        viewBinding true
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
     }
 }
 
