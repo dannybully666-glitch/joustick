@@ -1,58 +1,38 @@
-package com.example.virtualcontainer
+package com.example.container
 
-import android.app.ActivityOptions
-import android.content.Context
-import android.content.Intent
-import android.hardware.display.DisplayManager
+import android.app.Activity
 import android.os.Bundle
+import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
-import com.example.virtualcontainer.display.VirtualDisplayController
-import com.example.virtualcontainer.input.JoystickView
+import android.view.WindowManager
 
-class GameContainerActivity : AppCompatActivity() {
-
-    private lateinit var surfaceView: SurfaceView
-    private lateinit var virtualDisplayController: VirtualDisplayController
+class GameContainerActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val root = FrameLayout(this)
-        surfaceView = SurfaceView(this)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val joystick = JoystickView(this)
+        val surfaceView = SurfaceView(this)
 
-        root.addView(surfaceView)
-        root.addView(joystick)
-
-        setContentView(root)
-
-        surfaceView.holder.addCallback(object : android.view.SurfaceHolder.Callback {
-            override fun surfaceCreated(holder: android.view.SurfaceHolder) {
-                startVirtualDisplay(holder.surface)
+        surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                // ✅ Container is alive
+                // Rendering or attachment point goes here later
             }
-            override fun surfaceChanged(h: android.view.SurfaceHolder, f: Int, w: Int, h2: Int) {}
-            override fun surfaceDestroyed(h: android.view.SurfaceHolder) {}
+
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {}
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                // Cleanup later
+            }
         })
-    }
 
-    private fun startVirtualDisplay(surface: android.view.Surface) {
-        virtualDisplayController =
-            VirtualDisplayController(this, surface)
-
-        val pkg = intent.getStringExtra("TARGET_PACKAGE") ?: return
-        launchAppOnDisplay(pkg)
-    }
-
-    private fun launchAppOnDisplay(pkg: String) {
-        val intent = packageManager.getLaunchIntentForPackage(pkg) ?: return
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-        val options = ActivityOptions.makeBasic()
-        options.launchDisplayId = virtualDisplayController.display.displayId
-
-        startActivity(intent, options.toBundle())
+        setContentView(surfaceView)
     }
 }
