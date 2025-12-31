@@ -1,3 +1,18 @@
-<resources>
-    <style name="Theme.Container" parent="Theme.DeviceDefault.NoActionBar.Fullscreen"/>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.Container" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Fullscreen -->
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">
+            shortEdges
+        </item>
+
+        <!-- No action bar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Edge-to-edge -->
+        <item name="android:fitsSystemWindows">false</item>
+    </style>
+
 </resources>
