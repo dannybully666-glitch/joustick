@@ -1,6 +1,1 @@
-// Root build.gradle
-// Repositories are defined ONLY in settings.gradle (modern Gradle rule)
-
-buildscript {
-    // NO repositories here
-}
+// Modern Gradle: nothing needed here
