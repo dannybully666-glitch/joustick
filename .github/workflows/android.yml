@@ -11,26 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repo
-      - name: Checkout
-        uses: actions/checkout@v4
+      # 1️⃣ Checkout
+      - uses: actions/checkout@v4
 
-      # 2️⃣ Set up JDK 17 (MANDATORY)
+      # 2️⃣ Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # 3️⃣ Set up Android SDK
+      # 3️⃣ Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      # 4️⃣ Accept licenses
-      - name: Accept SDK licenses
+      # 4️⃣ Force accept ALL licenses (NON-INTERACTIVE)
+      - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
-      # 5️⃣ Install required SDK packages
+      # 5️⃣ Install ONLY required SDK packages
       - name: Install SDK packages
         run: |
           sdkmanager \
@@ -38,11 +37,11 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      # 6️⃣ Grant Gradle permission
-      - name: Grant execute permission for gradlew
+      # 6️⃣ Gradle permission
+      - name: Grant execute permission
         run: chmod +x ./gradlew
 
-      # 7️⃣ Build Debug APK
+      # 7️⃣ Build APK
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
