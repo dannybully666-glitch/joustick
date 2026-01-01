@@ -3,12 +3,14 @@ package com.example.ghostjoystick;
 import android.inputmethodservice.InputMethodService;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.widget.Button;
 
 public class GhostIME extends InputMethodService {
 
     private static GhostIME instance;
+
+    // Controlled by overlay / toggle
     public static boolean ENABLED = false;
 
     public static GhostIME getInstance() {
@@ -29,28 +31,37 @@ public class GhostIME extends InputMethodService {
 
     @Override
     public View onCreateInputView() {
-        View v = getLayoutInflater().inflate(R.layout.ime_keyboard, null);
-
-        bindKey(v, R.id.key_w, KeyEvent.KEYCODE_W);
-        bindKey(v, R.id.key_a, KeyEvent.KEYCODE_A);
-        bindKey(v, R.id.key_s, KeyEvent.KEYCODE_S);
-        bindKey(v, R.id.key_d, KeyEvent.KEYCODE_D);
-
-        return v;
+        return null; // NO visible keyboard
     }
 
-    private void bindKey(View root, int id, int keyCode) {
-        Button b = root.findViewById(id);
-        b.setOnTouchListener((v, e) -> {
-            InputConnection ic = getCurrentInputConnection();
-            if (ic == null || !ENABLED) return false;
+    @Override
+    public void onStartInput(EditorInfo info, boolean restarting) {
+        super.onStartInput(info, restarting);
+    }
 
-            if (e.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
-            } else if (e.getAction() == android.view.MotionEvent.ACTION_UP) {
-                ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
-            }
-            return true;
-        });
+    // ===============================
+    // METHODS REQUIRED BY KeyboardView
+    // ===============================
+
+    public static void keyDown(int keyCode) {
+        if (!ENABLED) return;
+        if (instance == null) return;
+
+        InputConnection ic = instance.getCurrentInputConnection();
+        if (ic == null) return;
+
+        long t = System.currentTimeMillis();
+        ic.sendKeyEvent(new KeyEvent(t, t, KeyEvent.ACTION_DOWN, keyCode, 0));
+    }
+
+    public static void keyUp(int keyCode) {
+        if (!ENABLED) return;
+        if (instance == null) return;
+
+        InputConnection ic = instance.getCurrentInputConnection();
+        if (ic == null) return;
+
+        long t = System.currentTimeMillis();
+        ic.sendKeyEvent(new KeyEvent(t, t, KeyEvent.ACTION_UP, keyCode, 0));
     }
 }
