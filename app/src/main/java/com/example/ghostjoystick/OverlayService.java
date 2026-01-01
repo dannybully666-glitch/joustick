@@ -20,13 +20,16 @@ public class OverlayService extends Service {
     public void onCreate() {
         super.onCreate();
 
+        // 🔴 REQUIRED ON ANDROID 14
+        startForeground(1, NotificationUtil.create(this));
+
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                200,   // REAL SIZE (IMPORTANT)
+                200,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
                 PixelFormat.TRANSLUCENT
         );
@@ -42,6 +45,7 @@ public class OverlayService extends Service {
         overlay.post(() -> {
             View ghost = overlay.findViewById(R.id.ghost_edit_text);
             ghost.requestFocus();
+
             InputMethodManager imm =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(ghost, InputMethodManager.SHOW_FORCED);
