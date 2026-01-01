@@ -3,6 +3,7 @@ package com.example.ghostjoystick;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.KeyEvent;   // 🔥 THIS WAS MISSING
 
 public class JoystickView extends View {
 
@@ -23,9 +24,13 @@ public class JoystickView extends View {
         }
 
         if (Math.abs(x) > Math.abs(y)) {
-            lastKey = x > 0 ? KeyEvent.KEYCODE_D : KeyEvent.KEYCODE_A;
+            lastKey = x > 0
+                    ? KeyEvent.KEYCODE_D
+                    : KeyEvent.KEYCODE_A;
         } else {
-            lastKey = y > 0 ? KeyEvent.KEYCODE_S : KeyEvent.KEYCODE_W;
+            lastKey = y > 0
+                    ? KeyEvent.KEYCODE_S
+                    : KeyEvent.KEYCODE_W;
         }
 
         GhostIME.sendKey(lastKey);
