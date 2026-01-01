@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 public class FocusOverlayService extends Service {
 
@@ -26,13 +28,12 @@ public class FocusOverlayService extends Service {
 
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
+        // 🚨 IMPORTANT: DO NOT USE FLAG_NOT_FOCUSABLE
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 1,
                 1,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
+                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
                 PixelFormat.TRANSLUCENT
         );
 
@@ -43,8 +44,15 @@ public class FocusOverlayService extends Service {
 
         wm.addView(overlay, params);
 
-        // 🔥 FORCE IME AFTER ATTACH
-        overlay.post(() -> focusEdit.requestIme());
+        // 🔥 FORCE FOCUS + IME AFTER ATTACH
+        overlay.post(() -> {
+            focusEdit.requestFocus();
+
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            imm.showSoftInput(focusEdit, InputMethodManager.SHOW_FORCED);
+        });
     }
 
     @Override
