@@ -2,17 +2,15 @@ package com.example.ghostjoystick;
 
 import android.content.Context;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 public class KeyboardView extends LinearLayout {
 
-    private final GhostIME ime;
-
-    public KeyboardView(Context context, GhostIME ime) {
+    public KeyboardView(Context context) {
         super(context);
-        this.ime = ime;
     }
 
     public void bind(View root) {
@@ -26,10 +24,11 @@ public class KeyboardView extends LinearLayout {
         Button b = root.findViewById(id);
 
         b.setOnTouchListener((v, e) -> {
-            if (e.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-                ime.sendDown(keyCode);
-            } else if (e.getAction() == android.view.MotionEvent.ACTION_UP) {
-                ime.sendUp(keyCode);
+            if (e.getAction() == MotionEvent.ACTION_DOWN) {
+                GhostIME.keyDown(keyCode);
+            } else if (e.getAction() == MotionEvent.ACTION_UP ||
+                       e.getAction() == MotionEvent.ACTION_CANCEL) {
+                GhostIME.keyUp(keyCode);
             }
             return true;
         });
