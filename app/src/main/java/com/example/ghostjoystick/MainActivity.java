@@ -1,10 +1,10 @@
 package com.example.ghostjoystick;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,25 +26,24 @@ public class MainActivity extends AppCompatActivity {
         toggleButton = findViewById(R.id.toggle_input);
         selectKeyboardButton = findViewById(R.id.select_keyboard);
 
-        // Ask for overlay permission ONCE
-        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
-            Intent i = new Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-            );
-            startActivity(i);
-        }
-
         updateStatus();
 
-        // TOGGLE INPUT
+        // TOGGLE INPUT BUTTON
         toggleButton.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(this)) {
+                    requestOverlayPermission();
+                    return;
+                }
+            }
+
             GhostIME.ENABLED = !GhostIME.ENABLED;
             updateStatus();
 
             if (GhostIME.ENABLED) {
-                startService(new Intent(this, FloatingFocusService.class));
+                startFloatingService();
             } else {
-                stopService(new Intent(this, FloatingFocusService.class));
+                stopFloatingService();
             }
         });
 
@@ -58,11 +57,39 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // User returned from overlay settings
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.canDrawOverlays(this) && GhostIME.ENABLED) {
+                startFloatingService();
+            }
+        }
+    }
+
     private void updateStatus() {
         if (GhostIME.ENABLED) {
             statusText.setText("STATUS: INPUT ENABLED");
         } else {
             statusText.setText("STATUS: INPUT DISABLED");
         }
+    }
+
+    private void startFloatingService() {
+        startService(new Intent(this, FloatingFocusService.class));
+    }
+
+    private void stopFloatingService() {
+        stopService(new Intent(this, FloatingFocusService.class));
+    }
+
+    private void requestOverlayPermission() {
+        Intent intent = new Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + getPackageName())
+        );
+        startActivity(intent);
     }
 }
