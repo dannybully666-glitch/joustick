@@ -15,19 +15,25 @@ public class ToggleNotificationService extends Service {
     private static final String CHANNEL_ID = "ghost_joystick";
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public void onCreate() {
+        super.onCreate();
+
         createChannel();
 
         Notification notification =
                 new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setContentTitle("Ghost Joystick")
-                        .setContentText("Tap to show keyboard")
-                        .setSmallIcon(android.R.drawable.ic_media_play)
+                        .setContentText("Tap to open keyboard")
+                        .setSmallIcon(android.R.drawable.stat_sys_input_method)
                         .setOngoing(true)
                         .build();
 
+        // MUST be here for Infinix
         startForeground(1, notification);
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
     }
 
@@ -39,10 +45,8 @@ public class ToggleNotificationService extends Service {
                             "Ghost Joystick",
                             NotificationManager.IMPORTANCE_LOW
                     );
-
-            NotificationManager nm =
-                    getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(channel);
+            getSystemService(NotificationManager.class)
+                    .createNotificationChannel(channel);
         }
     }
 
