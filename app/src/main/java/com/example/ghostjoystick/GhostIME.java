@@ -3,54 +3,110 @@ package com.example.ghostjoystick;
 import android.inputmethodservice.InputMethodService;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.LayoutInflater;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
 
+/**
+ * GhostIME
+ * Acts like a software hardware-keyboard (GameKeyboard style)
+ */
 public class GhostIME extends InputMethodService {
 
-    private View keyboardView;
+    // 🔥 STATIC ACTIVE INSTANCE (CRITICAL)
+    private static GhostIME instance;
 
+    public static GhostIME getInstance() {
+        return instance;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        instance = this;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (instance == this) instance = null;
+    }
+
+    /**
+     * This IME does NOT need a UI to function.
+     * You can return null safely.
+     */
     @Override
     public View onCreateInputView() {
-        keyboardView = LayoutInflater.from(this)
-                .inflate(R.layout.ime_keyboard, null);
-
-        KeyboardView helper = new KeyboardView(this, this);
-        helper.bind(keyboardView);
-
-        // 🔴 FORCE ATTACH
-        setInputView(keyboardView);
-        return keyboardView;
+        return null;
     }
 
+    /**
+     * Accept ALL input types
+     */
     @Override
-    public void onStartInputView(EditorInfo info, boolean restarting) {
-        super.onStartInputView(info, restarting);
-
-        // 🔴 FORCE SHOW IME WINDOW (OEM FIX)
-        showWindow(true);
-
-        if (keyboardView != null) {
-            setInputView(keyboardView);
-        }
+    public void onStartInput(EditorInfo info, boolean restarting) {
+        super.onStartInput(info, restarting);
     }
 
-    @Override
-    public boolean onEvaluateFullscreenMode() {
-        // 🔴 NEVER fullscreen (prevents OEM hiding)
-        return false;
+    // =========================================================
+    // 🔥 HARDWARE-STYLE KEY INJECTION (THIS IS THE MAGIC)
+    // =========================================================
+
+    public static void sendKey(int keyCode) {
+        GhostIME ime = instance;
+        if (ime == null) return;
+
+        long now = System.currentTimeMillis();
+
+        KeyEvent down = new KeyEvent(
+                now,
+                now,
+                KeyEvent.ACTION_DOWN,
+                keyCode,
+                0
+        );
+
+        KeyEvent up = new KeyEvent(
+                now,
+                now,
+                KeyEvent.ACTION_UP,
+                keyCode,
+                0
+        );
+
+        ime.sendKeyEvent(down);
+        ime.sendKeyEvent(up);
     }
 
-    void sendDown(int keyCode) {
-        InputConnection ic = getCurrentInputConnection();
-        if (ic == null) return;
-        ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+    /**
+     * For HOLD / movement keys (WASD)
+     */
+    public static void keyDown(int keyCode) {
+        GhostIME ime = instance;
+        if (ime == null) return;
+
+        KeyEvent down = new KeyEvent(
+                System.currentTimeMillis(),
+                System.currentTimeMillis(),
+                KeyEvent.ACTION_DOWN,
+                keyCode,
+                0
+        );
+
+        ime.sendKeyEvent(down);
     }
 
-    void sendUp(int keyCode) {
-        InputConnection ic = getCurrentInputConnection();
-        if (ic == null) return;
-        ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+    public static void keyUp(int keyCode) {
+        GhostIME ime = instance;
+        if (ime == null) return;
+
+        KeyEvent up = new KeyEvent(
+                System.currentTimeMillis(),
+                System.currentTimeMillis(),
+                KeyEvent.ACTION_UP,
+                keyCode,
+                0
+        );
+
+        ime.sendKeyEvent(up);
     }
 }
