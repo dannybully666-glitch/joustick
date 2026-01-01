@@ -32,6 +32,10 @@
                 android:resource="@xml/method" />
         </service>
 
+        <service
+    android:name=".FloatingFocusService"
+    android:exported="false"/>
+
     </application>
 
 </manifest>
