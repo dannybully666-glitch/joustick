@@ -1,1 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/overlay_root"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
 
+    <!-- Invisible focus anchor for IME -->
+    <com.example.ghostjoystick.GhostEditText
+        android:id="@+id/ghost_edit_text"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:alpha="0"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:cursorVisible="false"
+        android:background="@null"/>
+
+    <!-- OPTIONAL: joystick UI (can be visible later) -->
+    <!--
+    <com.example.ghostjoystick.JoystickView
+        android:id="@+id/joystick"
+        android:layout_width="200dp"
+        android:layout_height="200dp"/>
+    -->
+
+</FrameLayout>
