@@ -15,12 +15,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Ask overlay permission if missing
         if (!Settings.canDrawOverlays(this)) {
-            Intent intent = new Intent(
+            Intent i = new Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName())
             );
-            startActivity(intent);
+            startActivity(i);
         }
     }
 
@@ -28,15 +29,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (Settings.canDrawOverlays(this) && !started) {
+        if (!started && Settings.canDrawOverlays(this)) {
             started = true;
 
-            // 🔥 START THE TOGGLE OVERLAY
+            // 🔥 THIS IS THE CRITICAL LINE
             startForegroundService(
                     new Intent(this, ToggleOverlayService.class)
             );
 
-            finish();
+            finish(); // app closes by design
         }
     }
 }
