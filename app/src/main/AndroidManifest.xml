@@ -18,12 +18,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Overlay service -->
-        <service
-            android:name=".OverlayService"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection"/>
-
         <!-- IME -->
         <service
             android:name=".GhostIME"
