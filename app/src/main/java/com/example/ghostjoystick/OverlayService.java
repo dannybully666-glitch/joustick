@@ -9,11 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 
 public class OverlayService extends Service {
 
     private WindowManager wm;
-    private View overlayView;
+    private View overlay;
 
     @Override
     public void onCreate() {
@@ -32,28 +33,31 @@ public class OverlayService extends Service {
 
         params.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-        overlayView = inflater.inflate(R.layout.overlay_layout, null);
+        overlay = LayoutInflater.from(this)
+                .inflate(R.layout.overlay_layout, null);
 
-        wm.addView(overlayView, params);
+        wm.addView(overlay, params);
 
-        // Force focus + show IME
-        overlayView.post(() -> {
-            View ghost = overlayView.findViewById(R.id.ghost_edit_text);
+        // Force IME focus
+        overlay.post(() -> {
+            View ghost = overlay.findViewById(R.id.ghost_edit_text);
             ghost.requestFocus();
-
             InputMethodManager imm =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(ghost, InputMethodManager.SHOW_FORCED);
+        });
+
+        // BUTTON → SEND W
+        Button btn = overlay.findViewById(R.id.btn_move);
+        btn.setOnClickListener(v -> {
+            GhostIME.sendKey(android.view.KeyEvent.KEYCODE_W);
         });
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (overlayView != null) {
-            wm.removeView(overlayView);
-        }
+        if (overlay != null) wm.removeView(overlay);
     }
 
     @Override
