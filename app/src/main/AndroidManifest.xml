@@ -1,45 +1,53 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.ghostjoystick">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <!-- Required to run foreground notification service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
-        android:label="Ghost Joystick IME"
+        android:label="Ghost Joystick"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
 
+        <!-- Launcher activity (no UI, just starts service) -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- IME -->
+        <!-- ========================= -->
+        <!-- INPUT METHOD (IME) -->
+        <!-- ========================= -->
         <service
             android:name=".GhostIME"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">
+
             <intent-filter>
-                <action android:name="android.view.InputMethod"/>
+                <action android:name="android.view.InputMethod" />
             </intent-filter>
 
             <meta-data
                 android:name="android.view.im"
-                android:resource="@xml/ime_config"/>
+                android:resource="@xml/method" />
         </service>
 
+        <!-- ========================= -->
+        <!-- NOTIFICATION TOGGLE -->
+        <!-- ========================= -->
         <service
-    android:name=".FocusOverlayService"
-    android:exported="false"/>
-
-        <service
-    android:name=".ToggleOverlayService"
-    android:exported="false"
-    android:foregroundServiceType="mediaProjection"/>
+            android:name=".ToggleNotificationService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
     </application>
+
 </manifest>
