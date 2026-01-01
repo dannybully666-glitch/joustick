@@ -14,11 +14,10 @@ public class MainActivity extends Activity {
         Intent i = new Intent(this, ToggleNotificationService.class);
 
         if (Build.VERSION.SDK_INT >= 26) {
-            startForegroundService(i);
-        } else {
-            startService(i);
-        }
-
-        finish();
+    startForegroundService(new Intent(this, ToggleNotificationService.class));
+} else {
+    startService(new Intent(this, ToggleNotificationService.class));
+}
+finish();
     }
 }
