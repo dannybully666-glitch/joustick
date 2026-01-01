@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- REQUIRED FOR FLOATING BUTTON -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:label="Ghost Joystick"
         android:allowBackup="true"
@@ -32,9 +35,10 @@
                 android:resource="@xml/method" />
         </service>
 
+        <!-- Floating focus overlay -->
         <service
-    android:name=".FloatingFocusService"
-    android:exported="false"/>
+            android:name=".FloatingFocusService"
+            android:exported="false" />
 
     </application>
 
