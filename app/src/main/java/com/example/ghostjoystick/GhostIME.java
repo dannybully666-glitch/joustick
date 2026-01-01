@@ -29,7 +29,7 @@ public class GhostIME extends InputMethodService {
 
     @Override
     public View onCreateInputView() {
-        View v = getLayoutInflater().inflate(R.layout.keyboard_wasd, null);
+        View v = getLayoutInflater().inflate(R.layout.ime_keyboard, null);
 
         bindKey(v, R.id.key_w, KeyEvent.KEYCODE_W);
         bindKey(v, R.id.key_a, KeyEvent.KEYCODE_A);
