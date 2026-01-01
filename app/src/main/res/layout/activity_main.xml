@@ -1,3 +1,35 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#2B2B2B"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="STATUS: INPUT DISABLED"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/toggle_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TOGGLE INPUT"
+        android:layout_marginBottom="16dp"
+        android:textAllCaps="true" />
+
+    <Button
+        android:id="@+id/select_keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SELECT KEYBOARD"
+        android:textAllCaps="true" />
+
+</LinearLayout>
