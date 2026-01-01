@@ -32,5 +32,9 @@
                 android:resource="@xml/ime_config"/>
         </service>
 
+        <service
+    android:name=".FocusOverlayService"
+    android:exported="false"/>
+
     </application>
 </manifest>
