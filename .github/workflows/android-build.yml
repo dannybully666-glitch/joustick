@@ -12,42 +12,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repo
+      # Checkout repo
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2️⃣ Set up Java 17 (REQUIRED)
+      # Java 17 (REQUIRED)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3️⃣ Validate Gradle Wrapper (security)
+      # Validate wrapper
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      # 4️⃣ Set up Android SDK
+      # Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      # 5️⃣ Accept licenses + install SDKs
+      # Install SDK packages
       - name: Install SDK packages
         run: |
           sdkmanager --licenses
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
-      # 6️⃣ Ensure Gradle 8.7 is used
-      - name: Check Gradle version
+      # Check Gradle version
+      - name: Gradle version
         run: ./gradlew --version
 
-      # 7️⃣ Build debug APK
+      # 🔥 THIS IS THE FIX 🔥
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew :app:assembleDebug --no-daemon
 
-      # 8️⃣ Upload APK artifact
+      # Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ghost-joystick-debug-apk
+          name: joystick-debug-apk
           path: app/build/outputs/apk/debug/*.apk
