@@ -34,8 +34,7 @@
         <!-- Notification toggle -->
         <service
             android:name=".ToggleNotificationService"
-            android:exported="false"
-            android:foregroundServiceType="connectedDevice" />
+            android:exported="false"/>
 
         <receiver
             android:name=".ToggleReceiver"
