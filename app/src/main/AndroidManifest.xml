@@ -5,11 +5,8 @@
 
     <application
         android:label="Ghost Joystick"
-        android:allowBackup="true"
-        android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
 
-        <!-- Launcher activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -24,11 +21,9 @@
             android:name=".GhostIME"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.view.InputMethod" />
             </intent-filter>
-
             <meta-data
                 android:name="android.view.im"
                 android:resource="@xml/method" />
@@ -39,6 +34,10 @@
             android:name=".ToggleNotificationService"
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
+
+        <receiver
+            android:name=".ToggleReceiver"
+            android:exported="false" />
 
     </application>
 
