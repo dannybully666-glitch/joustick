@@ -11,15 +11,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setContentView(R.layout.activity_main);
 
         if (!Settings.canDrawOverlays(this)) {
-            startActivity(new Intent(
+            Intent i = new Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName())
-            ));
+            );
+            startActivity(i);
+        } else {
+            startService(new Intent(this, OverlayService.class));
+            finish();
         }
+    }
 
-        startService(new Intent(this, OverlayService.class));
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (Settings.canDrawOverlays(this)) {
+            startService(new Intent(this, OverlayService.class));
+            finish();
+        }
     }
 }
