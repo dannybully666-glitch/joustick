@@ -1,36 +1,16 @@
 package com.example.ghostjoystick;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-
-        if (!Settings.canDrawOverlays(this)) {
-            Intent i = new Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName())
-            );
-            startActivity(i);
-        } else {
-            startService(new Intent(this, OverlayService.class));
-            finish();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (Settings.canDrawOverlays(this)) {
-            startService(new Intent(this, OverlayService.class));
-            finish();
-        }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // No UI needed.
+        // This activity only exists so the app can be launched
+        // and the IME can be enabled in system settings.
+        finish();
     }
 }
