@@ -30,13 +30,11 @@ public class MainActivity extends Activity {
         Button toggle = new Button(this);
         toggle.setText("TOGGLE INPUT");
         toggle.setOnClickListener(v -> {
+            // Toggle IME logic
             GhostIME.ENABLED = !GhostIME.ENABLED;
             updateStatus();
-        });
 
-        Button picker = new Button(this);
-        picker.setText("SELECT KEYBOARD");
-        picker.setOnClickListener(v -> {
+            // 🔥 AUTO-OPEN keyboard picker
             InputMethodManager imm =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             if (imm != null) {
@@ -44,20 +42,21 @@ public class MainActivity extends Activity {
             }
         });
 
-        root.addView(status,
+        root.addView(
+                status,
                 new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+        );
 
-        root.addView(toggle,
+        root.addView(
+                toggle,
                 new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        root.addView(picker,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+        );
 
         setContentView(root);
     }
