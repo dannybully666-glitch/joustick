@@ -1,8 +1,8 @@
-// MainActivity.java
 package com.example.ghostjoystick;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 public class MainActivity extends Activity {
@@ -11,10 +11,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Start toggle notification
-        startService(new Intent(this, ToggleNotificationService.class));
+        Intent i = new Intent(this, ToggleNotificationService.class);
 
-        // Close UI immediately (like GameKeyboard)
+        if (Build.VERSION.SDK_INT >= 26) {
+            startForegroundService(i);
+        } else {
+            startService(i);
+        }
+
         finish();
     }
 }
