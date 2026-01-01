@@ -36,5 +36,9 @@
     android:name=".FocusOverlayService"
     android:exported="false"/>
 
+        <service
+    android:name=".ToggleOverlayService"
+    android:exported="false"/>
+
     </application>
 </manifest>
