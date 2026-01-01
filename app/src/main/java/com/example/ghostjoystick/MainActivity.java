@@ -1,71 +1,68 @@
 package com.example.ghostjoystick;
 
-import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.ViewGroup;
+import android.provider.Settings;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
 
-    private TextView status;
+public class MainActivity extends AppCompatActivity {
+
+    private TextView statusText;
+    private Button toggleButton;
+    private Button selectKeyboardButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setGravity(Gravity.CENTER);
-        root.setPadding(40, 40, 40, 40);
+        statusText = findViewById(R.id.status_text);
+        toggleButton = findViewById(R.id.toggle_input);
+        selectKeyboardButton = findViewById(R.id.select_keyboard);
 
-        status = new TextView(this);
-        status.setTextSize(18);
-        status.setPadding(0, 0, 0, 40);
+        // Ask for overlay permission ONCE
+        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
+            Intent i = new Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+            );
+            startActivity(i);
+        }
+
         updateStatus();
 
-        Button toggle = new Button(this);
-        toggle.setText("TOGGLE INPUT");
-        toggle.setOnClickListener(v -> {
-            // Toggle IME logic
+        // TOGGLE INPUT
+        toggleButton.setOnClickListener(v -> {
             GhostIME.ENABLED = !GhostIME.ENABLED;
             updateStatus();
 
-            // 🔥 AUTO-OPEN keyboard picker
+            if (GhostIME.ENABLED) {
+                startService(new Intent(this, FloatingFocusService.class));
+            } else {
+                stopService(new Intent(this, FloatingFocusService.class));
+            }
+        });
+
+        // SELECT KEYBOARD BUTTON
+        selectKeyboardButton.setOnClickListener(v -> {
             InputMethodManager imm =
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.showInputMethodPicker();
             }
         });
-
-        root.addView(
-                status,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-        );
-
-        root.addView(
-                toggle,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-        );
-
-        setContentView(root);
     }
 
     private void updateStatus() {
-        status.setText(
-                GhostIME.ENABLED
-                        ? "STATUS: INPUT ENABLED"
-                        : "STATUS: INPUT DISABLED"
-        );
+        if (GhostIME.ENABLED) {
+            statusText.setText("STATUS: INPUT ENABLED");
+        } else {
+            statusText.setText("STATUS: INPUT DISABLED");
+        }
     }
 }
